@@ -59,7 +59,7 @@ FinSense is built on a scalable, cloud-native microservices topology.
 ### Prerequisites
 - Node.js (v20+)
 - Docker Desktop
-- [Google Gemini API Key](https://aistudio.google.com/apikey)
+- [Google Gemini API Key](https://ai.google.dev/)
 - [MongoDB Atlas URI](https://www.mongodb.com/cloud/atlas/register) (Or run locally via Docker)
 
 ### Quick Start (Dockerized Environment)
