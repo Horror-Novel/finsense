@@ -1,0 +1,123 @@
+// Prisma schema — Postgres
+// Run `npx prisma migrate dev --name <name>` after editing this file.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- USERS ----------
+model User {
+  id              Int            @id @default(autoincrement())
+  name            String
+  email           String         @unique
+  passwordHash    String         @map("password_hash")
+  role            Role           @default(USER)
+  plan            Plan           @default(FREE)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  transactions    Transaction[]
+  categories      Category[]
+  subscriptions   Subscription[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+// ---------- CATEGORIES ----------
+model Category {
+  id           Int           @id @default(autoincrement())
+  name         String
+  icon         String        @default("💰")
+  userId       Int           @map("user_id")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("categories")
+}
+
+// ---------- TRANSACTIONS ----------
+model Transaction {
+  id           Int       @id @default(autoincrement())
+  description  String
+  merchant     String?
+  amount       Decimal   @db.Decimal(12, 2)
+  currency     String    @default("INR")
+  aiConfidence Float?    @map("ai_confidence")
+  source       Source    @default(MANUAL)
+  userId       Int       @map("user_id")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId   Int?      @map("category_id")
+  category     Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  receiptUrl   String?   @map("receipt_url")
+  spentAt      DateTime  @default(now()) @map("spent_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([userId, spentAt])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+enum Source {
+  MANUAL
+  AI_CATEGORIZED
+}
+
+// ---------- SUBSCRIPTIONS ----------
+// Tracks Razorpay payments + Pro plan lifecycle.
+// A user can have multiple subscription records (one per payment attempt).
+// Their active plan is the `plan` field on the User table — the latest
+// successful Subscription row is what sets it.
+model Subscription {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  razorpayOrderId  String   @unique @map("razorpay_order_id")
+  razorpayPaymentId String? @map("razorpay_payment_id")
+  amount           Int      // amount in paise (INR smallest unit)
+  currency         String   @default("INR")
+  status           PaymentStatus @default(PENDING)
+  plan             Plan     @default(PRO)
+  expiresAt        DateTime? @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+// ---------- LLM USAGE LOG ----------
+model LlmUsageLog {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  endpoint     String
+  model        String
+  inputTokens  Int      @map("input_tokens")
+  outputTokens Int      @map("output_tokens")
+  estCostUsd   Decimal  @map("est_cost_usd") @db.Decimal(10, 6)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("llm_usage_logs")
+}

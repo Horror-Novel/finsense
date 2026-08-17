@@ -1,0 +1,27 @@
+{
+  "name": "finsense",
+  "private": true,
+  "version": "3.0.0",
+  "description": "FinSense monorepo — Next.js frontend + Express backend",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "prisma:migrate": "npm run prisma:migrate --workspace=backend",
+    "prisma:seed": "npm run prisma:seed --workspace=backend",
+    "test": "npm run test --workspace=backend",
+    "test:unit": "npm run test:unit --workspace=backend",
+    "eval": "npm run eval --workspace=backend"
+  },
+  "devDependencies": {
+    "prisma": "^7.9.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.9.1"
+  }
+}
