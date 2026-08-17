@@ -1,0 +1,30 @@
+services:
+  # The Node.js Express Backend
+  - type: web
+    name: finsense-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install && npm run prisma:generate
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: finsense-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+
+databases:
+  # Managed PostgreSQL Database for Prisma
+  - name: finsense-postgres
+    databaseName: finsense
+    user: finsense_user
+    plan: free
