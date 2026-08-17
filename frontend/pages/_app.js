@@ -22,6 +22,7 @@ export default function App({ Component, pageProps }) {
     <AuthProvider initialUser={pageProps.user ?? null}>
       <Head>
         <title>FinSense</title>
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <SocketProvider>
         {getLayout(<Component {...pageProps} />)}
