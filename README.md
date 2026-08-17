@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://img.icons8.com/color/96/000000/finance-document.png" alt="FinSense Logo" />
+  <img src="logo.jpg" alt="FinSense Logo" width="128" />
   <br>
   <h1>FinSense AI</h1>
   <p><b>The Next-Generation Autonomous Financial Intelligence Platform</b></p>
