@@ -2,7 +2,11 @@
 // is automatically forwarded to Express's error-handling middleware
 // instead of crashing the process or requiring a try/catch in every route.
 const asyncHandler = (fn) => (req, res, next) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+  try {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = asyncHandler;

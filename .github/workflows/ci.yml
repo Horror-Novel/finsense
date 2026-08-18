@@ -23,6 +23,10 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
+    - name: Generate Prisma Client
+      run: npx prisma generate
+      working-directory: ./backend
+
     - name: Run Backend Unit Tests
       run: npm run test:unit
       working-directory: ./backend
