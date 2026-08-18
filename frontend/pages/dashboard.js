@@ -4,6 +4,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
+import HoistingDemo from "../components/HoistingDemo";
 
 const fmt = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
@@ -139,6 +140,8 @@ export default function Dashboard({ ssrTimestamp }) {
                 </div>
               </div>
             )}
+            
+            <HoistingDemo />
           </div>
         )}
 
