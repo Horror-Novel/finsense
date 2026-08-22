@@ -5,6 +5,7 @@ import ErrorBanner from "../components/ErrorBanner";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import HoistingDemo from "../components/HoistingDemo";
+import EventLoopDemo from "../components/EventLoopDemo";
 
 const fmt = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
@@ -142,6 +143,7 @@ export default function Dashboard({ ssrTimestamp }) {
             )}
             
             <HoistingDemo />
+            <EventLoopDemo />
           </div>
         )}
 
