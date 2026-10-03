@@ -11,6 +11,9 @@ The browser only ever talks to the frontend domain, so no CORS setup is needed.
 
 ## 1. Create the hosted services
 
+The API functions run in Mumbai (`regions: ["bom1"]` in `backend/vercel.json`).
+Create the databases in the same region (AWS ap-south-1) so queries stay local.
+
 Vercel doesn't run databases, so the backend needs hosted ones. All have free tiers.
 
 - **Postgres** — Neon (Vercel → Storage → Create → Neon). Connecting it to the
