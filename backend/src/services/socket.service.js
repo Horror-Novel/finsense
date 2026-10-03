@@ -1,5 +1,7 @@
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
+const { getPusher, userChannel } = require("../config/pusher");
+const { runInBackground } = require("../utils/background");
 
 let io = null;
 
@@ -48,9 +50,15 @@ function initSocket(httpServer) {
 
 // Broadcasts an event to every open tab/device for one specific user.
 // Called from controllers/tools after a transaction is created/deleted.
+// Uses Socket.io when the long-running server started it, and Pusher when
+// it's configured (Vercel, where there's no persistent server).
 function emitToUser(userId, event, payload) {
-  if (!io) return;
-  io.to(`user:${userId}`).emit(event, payload);
+  if (io) io.to(`user:${userId}`).emit(event, payload);
+
+  const pusher = getPusher();
+  if (pusher) {
+    runInBackground(pusher.trigger(userChannel(userId), event, payload), "Pusher event");
+  }
 }
 
 module.exports = { initSocket, emitToUser };

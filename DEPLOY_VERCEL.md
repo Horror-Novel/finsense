@@ -40,6 +40,7 @@ Vercel doesn't run databases, so the backend needs hosted ones. All have free ti
 | `BLOB_READ_WRITE_TOKEN` | for receipts | Set by the Blob integration |
 | `GEMINI_MODEL` | no | Defaults to `gemini-3.5-flash` |
 | `REDIS_URL` | no | Upstash URL |
+| `PUSHER_APP_ID` / `PUSHER_KEY` / `PUSHER_SECRET` / `PUSHER_CLUSTER` | for live sync | From a Pusher Channels app (App Keys tab) |
 | `GOOGLE_CLIENT_ID` | for Google login | OAuth client ID |
 | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | for payments | Razorpay keys |
 | `JWT_EXPIRES_IN` | no | Defaults to `7d` |
@@ -69,11 +70,14 @@ since they're baked in at build time.
 
 ## What behaves differently on Vercel
 
-- **Live cross-tab sync (Socket.io) is off.** Vercel functions can't hold
-  WebSocket connections. The app works normally; the navbar "Live" pill just
-  stays off and other open tabs update on refresh. To keep it, host the
-  backend on a long-running server (e.g. Render, see `render.yaml`) and set
-  `NEXT_PUBLIC_SOCKET_URL` to it.
+- **Live cross-tab sync uses Pusher instead of Socket.io.** Vercel functions
+  can't hold WebSocket connections, so the API publishes transaction events to
+  a private Pusher channel per user (`private-user-<id>`, authorized by
+  `/api/realtime/auth`). Create a free Pusher Channels app and set the four
+  `PUSHER_*` variables on the API project; the frontend picks them up from
+  `/api/realtime/config`, so no frontend rebuild is needed. Without them the
+  app works normally and the navbar "Live" pill stays off. Locally, Socket.io
+  is still used.
 - **Daily digest** runs through Vercel Cron at 08:00 UTC
   (`/api/cron/daily-digest`) instead of node-cron. "Run now" on the dashboard
   still works.
