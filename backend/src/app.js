@@ -13,6 +13,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const debugRoutes = require("./routes/debug.routes");
 const adminRoutes = require("./routes/admin.routes");
 const cronRoutes = require("./routes/cron.routes");
+const realtimeRoutes = require("./routes/realtime.routes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -54,6 +55,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/debug", debugRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/cron", cronRoutes);
+app.use("/api/realtime", realtimeRoutes);
 
 // --- 404 + centralized error handler (always last) ---
 app.use(notFound);

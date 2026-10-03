@@ -9,19 +9,12 @@ const { initRedis } = require("../src/config/redis");
 
 initRedis();
 
-module.exports = async (req, res) => {
-  // Health check answers without touching any database, so it's a quick
-  // way to confirm the deployment itself is live.
-  if (req.url.startsWith("/api/health")) return app(req, res);
-
-  try {
-    await connectMongo();
-  } catch (err) {
-    console.error("❌ MongoDB connection failed:", err.message);
-    res.statusCode = 503;
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ success: false, message: "Database unavailable" }));
-    return;
+module.exports = (req, res) => {
+  // Start (or reuse) the MongoDB connection without waiting for it.
+  // Mongoose queues queries until it's connected, so Postgres-only requests
+  // (most of the app) don't pay MongoDB's connection time on a cold start.
+  if (!req.url.startsWith("/api/health")) {
+    connectMongo().catch((err) => console.error("❌ MongoDB connection failed:", err.message));
   }
   return app(req, res);
 };
