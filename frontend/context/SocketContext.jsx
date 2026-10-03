@@ -14,7 +14,13 @@ export function SocketProvider({ children }) {
         ? localStorage.getItem("finsense_token")
         : null;
 
-    if (!user || !token) {
+    // Vercel's serverless backend can't hold WebSocket connections, so live
+    // sync is off there unless NEXT_PUBLIC_SOCKET_URL points at a socket
+    // server hosted elsewhere. Everything else works without it.
+    const realtimeAvailable =
+      Boolean(process.env.NEXT_PUBLIC_SOCKET_URL) || !process.env.NEXT_PUBLIC_VERCEL_ENV;
+
+    if (!user || !token || !realtimeAvailable) {
       socketRef.current?.disconnect?.();
       socketRef.current = null;
       setConnected(false);
