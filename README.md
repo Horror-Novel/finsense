@@ -3,6 +3,7 @@
   <br>
   <h1>FinSense AI</h1>
   <p><b>The Next-Generation Autonomous Financial Intelligence Platform</b></p>
+  <p><a href="https://finsense-drab.vercel.app"><b>🚀 Live demo: finsense-drab.vercel.app</b></a></p>
   <br>
 </div>
 
