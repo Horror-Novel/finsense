@@ -93,6 +93,7 @@ const postChat = asyncHandler(async (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no"); // stop proxies (Vercel, nginx) buffering the stream
   res.flushHeaders();
 
   try {

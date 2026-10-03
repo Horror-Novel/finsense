@@ -12,9 +12,14 @@ const digestRoutes = require("./routes/digests.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const debugRoutes = require("./routes/debug.routes");
 const adminRoutes = require("./routes/admin.routes");
+const cronRoutes = require("./routes/cron.routes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
+
+// Behind Vercel's / Render's proxy — lets express-rate-limit see the real
+// client IP from X-Forwarded-For instead of the proxy's.
+app.set("trust proxy", 1);
 
 // --- Global middleware ---
 app.use(
@@ -26,7 +31,8 @@ app.use(
 app.use(express.json({ limit: "1mb" })); // body parsing + implicit size-based sanitization
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev")); // request logging
 
-// Serve uploaded receipt images
+// Serve uploaded receipt images (local disk only; on Vercel receipts go to
+// Vercel Blob and are served from their own public URL)
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // --- Health check ---
@@ -47,6 +53,7 @@ app.use("/api/payments", paymentRoutes);
 // a browser during the viva to show live runtime proof of both concepts.
 app.use("/api/debug", debugRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/cron", cronRoutes);
 
 // --- 404 + centralized error handler (always last) ---
 app.use(notFound);
