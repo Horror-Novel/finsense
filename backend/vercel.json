@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "public",
+  "regions": [
+    "bom1"
+  ],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/daily-digest",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}
