@@ -5,6 +5,7 @@ const { categorizeExpense } = require("../services/llm.service");
 const { cacheGet, cacheSet, cacheDel } = require("../config/redis");
 const { emitToUser } = require("../services/socket.service");
 const { indexTransaction, deleteEmbedding } = require("../services/rag.service");
+const { runInBackground } = require("../utils/background");
 
 // GET /api/transactions?month=2026-08&categoryId=3&sort=amount&order=desc&groupBy=category
 // Demonstrates filtering, ordering, and grouping (SQL JOINs happen via `include`)
@@ -149,7 +150,7 @@ const createTransaction = asyncHandler(async (req, res) => {
   // RAG INDEXING: fire-and-forget — generates a text embedding for this
   // transaction and stores it in MongoDB. Never awaited, so the user sees
   // their new transaction immediately rather than waiting for the embedding.
-  indexTransaction(transaction).catch(() => {});
+  runInBackground(indexTransaction(transaction), "Embedding transaction");
 
   // WEBSOCKET: broadcast to any other open tab/device for this same user
   emitToUser(req.user.id, "transaction:created", transaction);
@@ -191,7 +192,7 @@ const deleteTransaction = asyncHandler(async (req, res) => {
 
   await cacheDel(`summary:${req.user.id}`);
   emitToUser(req.user.id, "transaction:deleted", { id });
-  deleteEmbedding(req.user.id, id).catch(() => {});
+  runInBackground(deleteEmbedding(req.user.id, id), "Deleting embedding");
 
   res.status(200).json({ success: true, message: "Transaction deleted" });
 });
