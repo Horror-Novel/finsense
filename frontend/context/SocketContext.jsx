@@ -32,9 +32,9 @@ export function SocketProvider({ children }) {
     let socket;
 
     import("socket.io-client").then(({ io }) => {
-      // In production (Vercel), /socket.io/* is rewritten to the backend
-      // container, so the browser connects to the same origin.
-      // In local dev, fall back to localhost:5000.
+      // Outside localhost (e.g. Docker), next.config.js rewrites /socket.io/*
+      // to the backend, so the browser connects to the same origin.
+      // In local dev, connect to the backend on port 5000 directly.
       const socketUrl =
         process.env.NEXT_PUBLIC_SOCKET_URL ||
         (typeof window !== "undefined" && window.location.hostname !== "localhost"
