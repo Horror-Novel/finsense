@@ -30,3 +30,13 @@ backend/prisma/migrations/dev.db
 
 # --- Test coverage ---
 coverage/
+
+# --- Vercel ---
+.vercel/
+
+# --- Production env (never commit real secrets) ---
+.env.production
+.env.production.local
+
+# --- Next.js build output ---
+frontend/.next/

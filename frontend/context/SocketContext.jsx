@@ -24,12 +24,14 @@ export function SocketProvider({ children }) {
     let socket;
 
     import("socket.io-client").then(({ io }) => {
-      // Browser connects directly to the backend Socket.IO server.
+      // In production (Vercel), /socket.io/* is rewritten to the backend
+      // container, so the browser connects to the same origin.
+      // In local dev, fall back to localhost:5000.
       const socketUrl =
         process.env.NEXT_PUBLIC_SOCKET_URL ||
-        (typeof window !== "undefined"
-          ? `${window.location.protocol}//${window.location.hostname}:5000`
-          : "http://localhost:5000");
+        (typeof window !== "undefined" && window.location.hostname !== "localhost"
+          ? window.location.origin
+          : `${window.location.protocol}//${window.location.hostname}:5000`);
 
       socket = io(socketUrl, {
         path: "/socket.io",

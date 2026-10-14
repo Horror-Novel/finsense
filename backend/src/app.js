@@ -17,9 +17,19 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 const app = express();
 
 // --- Global middleware ---
+// CLIENT_ORIGIN can be a single URL or comma-separated list, e.g.
+// "http://localhost:5173,https://finsense.vercel.app"
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((o) => o.trim());
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: (origin, cb) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      cb(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
   })
 );
