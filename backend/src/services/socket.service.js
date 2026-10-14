@@ -12,9 +12,13 @@ let io = null;
 // chat streaming, which is a one-way server->client text stream; this
 // WebSocket layer is for structured, bidirectional, low-latency events.
 function initSocket(httpServer) {
+  const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((o) => o.trim());
+
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      origin: allowedOrigins,
       credentials: true,
     },
   });

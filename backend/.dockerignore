@@ -1,5 +1,12 @@
 node_modules
-npm-debug.log
+npm-debug.log*
 .env
+.env.*
 uploads/*
 !uploads/.gitkeep
+tests/
+evals/
+coverage/
+.git
+.github
+*.md

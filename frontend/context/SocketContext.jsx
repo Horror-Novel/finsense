@@ -32,12 +32,14 @@ export function SocketProvider({ children }) {
     let socket;
 
     import("socket.io-client").then(({ io }) => {
-      // Browser connects directly to the backend Socket.IO server.
+      // Outside localhost (e.g. Docker), next.config.js rewrites /socket.io/*
+      // to the backend, so the browser connects to the same origin.
+      // In local dev, connect to the backend on port 5000 directly.
       const socketUrl =
         process.env.NEXT_PUBLIC_SOCKET_URL ||
-        (typeof window !== "undefined"
-          ? `${window.location.protocol}//${window.location.hostname}:5000`
-          : "http://localhost:5000");
+        (typeof window !== "undefined" && window.location.hostname !== "localhost"
+          ? window.location.origin
+          : `${window.location.protocol}//${window.location.hostname}:5000`);
 
       socket = io(socketUrl, {
         path: "/socket.io",

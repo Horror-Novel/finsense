@@ -2,7 +2,7 @@ const prisma = require("../config/prisma");
 const ChatMessage = require("../models/ChatMessage");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/apiError");
-const { streamBasicChatReply } = require("../services/llm.service");
+const { streamChatReply } = require("../services/llm.service");
 
 // GET /api/chat/history
 // Chat history lives in MongoDB. (Read)
@@ -97,13 +97,16 @@ const postChat = asyncHandler(async (req, res) => {
   res.flushHeaders();
 
   try {
-    const fullReply = await streamBasicChatReply({
+    const fullReply = await streamChatReply({
       userId: req.user.id,
       question: cleanQuestion,
       transactionsSummary,
       history,
       onToken: (chunk) => {
         res.write(`data: ${JSON.stringify({ token: chunk })}\n\n`);
+      },
+      onToolCall: (toolCall) => {
+        res.write(`data: ${JSON.stringify({ toolCall })}\n\n`);
       },
     });
 
